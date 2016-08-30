@@ -21,11 +21,14 @@ public class GameScreen implements Screen {
 
     private Texture dropImage;
     private Texture bucketImage;
+    private Texture fireballImage;
     private Sound dropSound;
-//    private Music rainMusic;
+    private Sound crashSound;
+    //    private Music rainMusic;
     private OrthographicCamera camera;
     private Rectangle bucket;
     private Array<Rectangle> raindrops;
+    private Array<Rectangle> fireballs;
     private long lastDropTime;
     private int dropsGathered;
 
@@ -35,9 +38,11 @@ public class GameScreen implements Screen {
         // load the images for the droplet and the bucket, 64x64 pixels each
         dropImage = new Texture(Gdx.files.internal("droplet.png"));
         bucketImage = new Texture(Gdx.files.internal("bucket.png"));
+        fireballImage = new Texture(Gdx.files.internal("fireball.png"));
 
         // load the drop sound effect and the rain background "music"
         dropSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
+        crashSound = Gdx.audio.newSound(Gdx.files.internal("crash.wav"));
 //        rainMusic = Gdx.audio.newMusic(Gdx.files.internal("rain.mp3"));
 //        rainMusic.setLooping(true);
 
@@ -57,6 +62,8 @@ public class GameScreen implements Screen {
         raindrops = new Array<Rectangle>();
         spawnRaindrop();
 
+        fireballs = new Array<Rectangle>();
+
     }
 
     private void spawnRaindrop() {
@@ -66,6 +73,16 @@ public class GameScreen implements Screen {
         raindrop.width = 64;
         raindrop.height = 64;
         raindrops.add(raindrop);
+        lastDropTime = TimeUtils.nanoTime();
+    }
+
+    private void spawnFireball() {
+        Rectangle fireball = new Rectangle();
+        fireball.x = MathUtils.random(0, 800 - 64);
+        fireball.y = 480;
+        fireball.width = 64;
+        fireball.height = 64;
+        fireballs.add(fireball);
         lastDropTime = TimeUtils.nanoTime();
     }
 
@@ -93,6 +110,9 @@ public class GameScreen implements Screen {
         for (Rectangle raindrop : raindrops) {
             game.batch.draw(dropImage, raindrop.x, raindrop.y);
         }
+        for (Rectangle fireball : fireballs) {
+            game.batch.draw(fireballImage, fireball.x, fireball.y);
+        }
         game.batch.end();
 
         // process user input
@@ -114,8 +134,11 @@ public class GameScreen implements Screen {
             bucket.x = 800 - 64;
 
         // check if we need to create a new raindrop
-        if (TimeUtils.nanoTime() - lastDropTime > 1000000000)
-            spawnRaindrop();
+        if (TimeUtils.nanoTime() - lastDropTime > 1000000000) {
+            if (MathUtils.random(0, 10) < 9) {
+                spawnRaindrop();
+            } else spawnFireball();
+        }
 
         // move the raindrops, remove any that are beneath the bottom edge of
         // the screen or that hit the bucket. In the later case we increase the
@@ -130,6 +153,20 @@ public class GameScreen implements Screen {
                 dropsGathered++;
                 dropSound.play();
                 iter.remove();
+            }
+        }
+
+        if (fireballs.size > 0) {
+            iter = fireballs.iterator();
+            while (iter.hasNext()) {
+                Rectangle fireball = iter.next();
+                fireball.y -= 200 * Gdx.graphics.getDeltaTime();
+                if (fireball.y + 64 < 0)
+                    iter.remove();
+                if (fireball.overlaps(bucket)) {
+                    crashSound.play();
+                    iter.remove();
+                }
             }
         }
     }
@@ -161,6 +198,7 @@ public class GameScreen implements Screen {
     public void dispose() {
         dropImage.dispose();
         bucketImage.dispose();
+        fireballImage.dispose();
         dropSound.dispose();
 //        rainMusic.dispose();
     }
