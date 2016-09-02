@@ -1,20 +1,17 @@
 package com.github.gaddsky.extradrop;
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.github.gaddsky.extradrop.gamehelpers.AssetLoader;
 
 
 public class ExtraDrop extends Game {
 
-    public SpriteBatch batch;
-    public BitmapFont font;
+    private int screenWidth = 800;
+    private int screenHeight = 480;
 
     public void create() {
-        batch = new SpriteBatch();
-        //Use LibGDX's default Arial font.
-        font = new BitmapFont();
-        this.setScreen(new MainMenuScreen(this));
+        AssetLoader.load();
+        setScreen(new GameScreen(this));
     }
 
     public void render() {
@@ -22,7 +19,14 @@ public class ExtraDrop extends Game {
     }
 
     public void dispose() {
-        batch.dispose();
-        font.dispose();
+        AssetLoader.dispose();
+    }
+
+    public int getScreenWidth() {
+        return screenWidth;
+    }
+
+    public int getScreenHeight() {
+        return screenHeight;
     }
 }
