@@ -49,7 +49,7 @@ public class GameWorld {
 
 
     public void updateRunning(float delta) {
-        bucket.update(delta);
+        bucket.update(delta, gameWidth);
         iter = raindrops.iterator();
         while (iter.hasNext()) {
             Drop drop = iter.next();

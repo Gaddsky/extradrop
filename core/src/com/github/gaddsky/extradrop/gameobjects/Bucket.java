@@ -24,7 +24,7 @@ public class Bucket {
         this.targetX = x;
 }
 
-    public void update(float delta) {
+    public void update(float delta, float gameWidth) {
         if (Math.abs(targetX - x) < (speed * delta)) {
             x = targetX - width/2;
         }
@@ -33,6 +33,8 @@ public class Bucket {
         } else if (targetX > x + width / 2) {
             x += speed * delta;
         }
+        if (x < 0) x = 0;
+        if (x > gameWidth - width) x = (int)gameWidth - width;
         bound.setX(x);
         bound.setY(y);
     }
