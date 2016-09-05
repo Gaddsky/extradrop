@@ -1,5 +1,7 @@
 package com.github.gaddsky.extradrop.gameworld;
 
+import com.badlogic.gdx.Application;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
@@ -49,6 +51,11 @@ public class GameWorld {
 
 
     public void updateRunning(float delta) {
+        if (Gdx.app.getType() == Application.ApplicationType.Android) {
+            if (Gdx.input.getAccelerometerY() < -1) bucket.setTargetX(0);
+            else if (Gdx.input.getAccelerometerY() > 1) bucket.setTargetX((int) gameWidth);
+            else bucket.setTargetX(bucket.getX());
+        }
         bucket.update(delta, gameWidth);
         iter = raindrops.iterator();
         while (iter.hasNext()) {
