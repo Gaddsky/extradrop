@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.github.gaddsky.extradrop.gamehelpers.AssetLoader;
 import com.github.gaddsky.extradrop.gameobjects.Bucket;
 import com.github.gaddsky.extradrop.gameobjects.Drop;
+import com.github.gaddsky.extradrop.gameobjects.LifeScore;
 
 import java.util.Iterator;
 
@@ -17,6 +18,7 @@ public class GameWorld {
     private Array<Drop> raindrops;
     private Array<Drop> fireballs;
     private Bucket bucket;
+    private LifeScore lifescore;
     private long lastDropTime;
     private float gameWidth;
     private float gameHeight;
@@ -35,6 +37,7 @@ public class GameWorld {
         bucket = new Bucket((int) gameWidth / 2, 0, 400);
         raindrops = new Array<Drop>();
         fireballs = new Array<Drop>();
+        lifescore = new LifeScore(5);
         spawnRaindrop();
     }
 
@@ -78,7 +81,9 @@ public class GameWorld {
             if (bucket.getBound().overlaps(drop.getBound())) {
                 iter.remove();
                 AssetLoader.crashSound.play();
-                bucket.dropGather();
+                lifescore.lostOfLife();
+                clearScreen();
+                if (!lifescore.isAlive()) gameOver();
             }
             if (drop.isFalled()) {
                 iter.remove();
@@ -108,6 +113,16 @@ public class GameWorld {
         lastDropTime = TimeUtils.nanoTime();
     }
 
+    private void clearScreen() {
+        raindrops.clear();
+        fireballs.clear();
+    }
+
+    private void gameOver() { // dummy game over
+        System.out.println("Game over!");
+        System.exit(0);
+    }
+
     public Array<Drop> getRaindrops() {
         return raindrops;
     }
@@ -118,6 +133,10 @@ public class GameWorld {
 
     public Bucket getBucket() {
         return bucket;
+    }
+
+    public LifeScore getLifeScore() {
+        return lifescore;
     }
 
     public boolean isMenu() {

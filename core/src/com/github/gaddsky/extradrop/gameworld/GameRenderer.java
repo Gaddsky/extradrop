@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.Array;
 import com.github.gaddsky.extradrop.gamehelpers.AssetLoader;
 import com.github.gaddsky.extradrop.gameobjects.Bucket;
 import com.github.gaddsky.extradrop.gameobjects.Drop;
+import com.github.gaddsky.extradrop.gameobjects.LifeScore;
 
 
 public class GameRenderer {
@@ -20,6 +21,7 @@ public class GameRenderer {
     private Bucket bucket;
     private Array<Drop> raindrops;
     private Array<Drop> fireballs;
+    private LifeScore lifescore;
 
 
     public GameRenderer(GameWorld world, int gameWidth, int gameHeight) {
@@ -29,6 +31,7 @@ public class GameRenderer {
         bucket = world.getBucket();
         raindrops = world.getRaindrops();
         fireballs = world.getFireballs();
+        lifescore = world.getLifeScore();
 
 
         // create the camera
@@ -81,10 +84,19 @@ public class GameRenderer {
         for (Drop fireball : fireballs) {
             batch.draw(AssetLoader.fireballImage, fireball.getX(), fireball.getY());
         }
+        drawLifeScore();
     }
 
     private void drawMenu() {
         font.draw(batch, "Welcome to ExtraDrop!!! ", 100, 150);
         font.draw(batch, "Tap anywhere to begin!", 100, 100);
+    }
+
+    private void drawLifeScore() {
+        for (int i = 1; i <= lifescore.getRestOfLifes(); i++) {
+            batch.draw(AssetLoader.lifeScoreImage,
+                    gameWidth - (lifescore.getRestOfLifes() + 2) * lifescore.getWidth() + lifescore.getWidth() * i,
+                    gameHeight - lifescore.getHeight() * 2);
+        }
     }
 }
